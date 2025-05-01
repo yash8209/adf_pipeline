@@ -1,0 +1,29 @@
+{
+	"name": "pipeline2",
+	"properties": {
+		"activities": [
+			{
+				"name": "demo wait",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": {
+						"value": "@pipeline().parameters.waitseconds",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"concurrency": 1,
+		"parameters": {
+			"waitseconds": {
+				"type": "int",
+				"defaultValue": 2
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-05-01T04:16:00Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

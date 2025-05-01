@@ -1,0 +1,9 @@
+{
+	"name": "yashpdatafactory",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "e8c2f2c9-5627-48cb-a9fe-a7bdbb5afd51",
+		"tenantId": "1455eaf6-6b7d-470b-ae16-2d98b42f2908"
+	}
+}
