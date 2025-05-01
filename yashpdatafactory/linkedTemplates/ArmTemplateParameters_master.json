@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "yashpdatafactory"
+		},
+		"productblob1_connectionString": {
+			"value": ""
+		},
+		"productblob2_connectionString": {
+			"value": ""
+		},
+		"productdb_password": {
+			"value": ""
+		},
+		"productsserver_password": {
+			"value": ""
+		},
+		"productdb_properties_typeProperties_server": {
+			"value": "yashpserver2.database.windows.net"
+		},
+		"productdb_properties_typeProperties_database": {
+			"value": "yashpdatabase"
+		},
+		"productdb_properties_typeProperties_userName": {
+			"value": "yashp"
+		},
+		"productsserver_properties_typeProperties_server": {
+			"value": "yashpserver2.database.windows.net"
+		},
+		"productsserver_properties_typeProperties_database": {
+			"value": "yashpdatabase"
+		},
+		"productsserver_properties_typeProperties_userName": {
+			"value": "yashp"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
