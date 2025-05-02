@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'TripDataLake'"
 		},
+		"TripDataSink_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'TripDataSink'"
+		},
 		"productblob1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'productblob1'"
@@ -115,6 +119,9 @@
 					"TripDataLake_accountKey": {
 						"value": "[parameters('TripDataLake_accountKey')]"
 					},
+					"TripDataSink_connectionString": {
+						"value": "[parameters('TripDataSink_connectionString')]"
+					},
 					"productblob1_connectionString": {
 						"value": "[parameters('productblob1_connectionString')]"
 					},
@@ -163,6 +170,26 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "yashpdatafactory_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'yashpdatafactory_ArmTemplate_0')]"
+			]
 		}
 	]
 }
