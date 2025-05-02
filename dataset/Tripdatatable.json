@@ -67,7 +67,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "TripData"
+			"table": "TripFares"
 		}
 	}
 }
