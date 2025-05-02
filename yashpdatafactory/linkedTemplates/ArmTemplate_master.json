@@ -7,6 +7,18 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "yashpdatafactory"
 		},
+		"ADLSGen2_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLSGen2'"
+		},
+		"TripDataBase_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'TripDataBase'"
+		},
+		"TripDataLake_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'TripDataLake'"
+		},
 		"productblob1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'productblob1'"
@@ -22,6 +34,26 @@
 		"productsserver_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'productsserver'"
+		},
+		"ADLSGen2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalakestyashp.dfs.core.windows.net/"
+		},
+		"TripDataBase_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "yashpserver2.database.windows.net"
+		},
+		"TripDataBase_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "taxi-data"
+		},
+		"TripDataBase_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "yashp"
+		},
+		"TripDataLake_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://datalakestyashp.dfs.core.windows.net/"
 		},
 		"productdb_properties_typeProperties_server": {
 			"type": "string",
@@ -74,6 +106,15 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"ADLSGen2_accountKey": {
+						"value": "[parameters('ADLSGen2_accountKey')]"
+					},
+					"TripDataBase_password": {
+						"value": "[parameters('TripDataBase_password')]"
+					},
+					"TripDataLake_accountKey": {
+						"value": "[parameters('TripDataLake_accountKey')]"
+					},
 					"productblob1_connectionString": {
 						"value": "[parameters('productblob1_connectionString')]"
 					},
@@ -85,6 +126,21 @@
 					},
 					"productsserver_password": {
 						"value": "[parameters('productsserver_password')]"
+					},
+					"ADLSGen2_properties_typeProperties_url": {
+						"value": "[parameters('ADLSGen2_properties_typeProperties_url')]"
+					},
+					"TripDataBase_properties_typeProperties_server": {
+						"value": "[parameters('TripDataBase_properties_typeProperties_server')]"
+					},
+					"TripDataBase_properties_typeProperties_database": {
+						"value": "[parameters('TripDataBase_properties_typeProperties_database')]"
+					},
+					"TripDataBase_properties_typeProperties_userName": {
+						"value": "[parameters('TripDataBase_properties_typeProperties_userName')]"
+					},
+					"TripDataLake_properties_typeProperties_url": {
+						"value": "[parameters('TripDataLake_properties_typeProperties_url')]"
 					},
 					"productdb_properties_typeProperties_server": {
 						"value": "[parameters('productdb_properties_typeProperties_server')]"

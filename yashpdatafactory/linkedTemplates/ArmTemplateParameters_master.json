@@ -5,6 +5,15 @@
 		"factoryName": {
 			"value": "yashpdatafactory"
 		},
+		"ADLSGen2_accountKey": {
+			"value": ""
+		},
+		"TripDataBase_password": {
+			"value": ""
+		},
+		"TripDataLake_accountKey": {
+			"value": ""
+		},
 		"productblob1_connectionString": {
 			"value": ""
 		},
@@ -16,6 +25,21 @@
 		},
 		"productsserver_password": {
 			"value": ""
+		},
+		"ADLSGen2_properties_typeProperties_url": {
+			"value": "https://datalakestyashp.dfs.core.windows.net/"
+		},
+		"TripDataBase_properties_typeProperties_server": {
+			"value": "yashpserver2.database.windows.net"
+		},
+		"TripDataBase_properties_typeProperties_database": {
+			"value": "taxi-data"
+		},
+		"TripDataBase_properties_typeProperties_userName": {
+			"value": "yashp"
+		},
+		"TripDataLake_properties_typeProperties_url": {
+			"value": "https://datalakestyashp.dfs.core.windows.net/"
 		},
 		"productdb_properties_typeProperties_server": {
 			"value": "yashpserver2.database.windows.net"
