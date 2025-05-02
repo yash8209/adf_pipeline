@@ -1,0 +1,23 @@
+{
+	"name": "AvgSinkTable",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "TripDataSink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "TripDataAggCsv",
+				"container": "tripdata"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
