@@ -1,0 +1,23 @@
+{
+	"name": "adventurelookupcsv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adventureblob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "adventurelookup.csv",
+				"container": "lookup"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

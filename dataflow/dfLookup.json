@@ -1,0 +1,125 @@
+{
+	"name": "dfLookup",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SalesOrderHeadTable",
+						"type": "DatasetReference"
+					},
+					"name": "SalesorderStream"
+				},
+				{
+					"dataset": {
+						"referenceName": "costumerTable",
+						"type": "DatasetReference"
+					},
+					"name": "CostumerStream"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "adventurelookupcsv",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "selectcolumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SalesOrderID as integer,",
+				"          RevisionNumber as integer,",
+				"          OrderDate as timestamp,",
+				"          DueDate as timestamp,",
+				"          ShipDate as timestamp,",
+				"          Status as integer,",
+				"          OnlineOrderFlag as boolean,",
+				"          SalesOrderNumber as string,",
+				"          PurchaseOrderNumber as string,",
+				"          AccountNumber as string,",
+				"          CustomerID as integer,",
+				"          ShipToAddressID as integer,",
+				"          BillToAddressID as integer,",
+				"          ShipMethod as string,",
+				"          CreditCardApprovalCode as string,",
+				"          SubTotal as decimal(19,4),",
+				"          TaxAmt as decimal(19,4),",
+				"          Freight as decimal(19,4),",
+				"          TotalDue as decimal(19,4),",
+				"          Comment as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SalesorderStream",
+				"source(output(",
+				"          CustomerID as integer,",
+				"          NameStyle as boolean,",
+				"          Title as string,",
+				"          FirstName as string,",
+				"          MiddleName as string,",
+				"          LastName as string,",
+				"          Suffix as string,",
+				"          CompanyName as string,",
+				"          SalesPerson as string,",
+				"          EmailAddress as string,",
+				"          Phone as string,",
+				"          PasswordHash as string,",
+				"          PasswordSalt as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> CostumerStream",
+				"SalesorderStream, CostumerStream lookup(SalesorderStream@CustomerID == CostumerStream@CustomerID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 select(mapColumn(",
+				"          SalesOrderID,",
+				"          OrderDate,",
+				"          Status,",
+				"          SalesOrderNumber,",
+				"          PurchaseOrderNumber,",
+				"          AccountNumber,",
+				"          CustomerID = SalesorderStream@CustomerID,",
+				"          SubTotal,",
+				"          TaxAmt,",
+				"          Freight,",
+				"          TotalDue,",
+				"          CustomerID = CostumerStream@CustomerID,",
+				"          NameStyle,",
+				"          Title,",
+				"          FirstName,",
+				"          MiddleName,",
+				"          LastName,",
+				"          CompanyName,",
+				"          SalesPerson,",
+				"          EmailAddress,",
+				"          Phone",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectcolumns",
+				"selectcolumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
