@@ -39,6 +39,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'productsserver'"
 		},
+		"adventureworksdb_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'adventureworksdb'"
+		},
+		"adventureblob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'adventureblob'"
+		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakestyashp.dfs.core.windows.net/"
@@ -80,6 +88,18 @@
 			"defaultValue": "yashpdatabase"
 		},
 		"productsserver_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "yashp"
+		},
+		"adventureworksdb_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "yashpserver2.database.windows.net"
+		},
+		"adventureworksdb_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "yashpdatabase"
+		},
+		"adventureworksdb_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "yashp"
 		}
@@ -257,6 +277,41 @@
 						"type": "SecureString",
 						"value": "[parameters('productsserver_password')]"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adventureworksdb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('adventureworksdb_properties_typeProperties_server')]",
+					"database": "[parameters('adventureworksdb_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('adventureworksdb_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('adventureworksdb_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adventureblob')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('adventureblob_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -554,401 +609,248 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/SalesOrderHeadTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".csv"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "AzureSqlTable1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "productcsv",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"waitseconds": {
-						"type": "int",
-						"defaultValue": 2
-					}
+				"linkedServiceName": {
+					"referenceName": "adventureworksdb",
+					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"lastPublishTime": "2025-05-01T04:16:01Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
-				"[concat(variables('factoryId'), '/datasets/productcsv')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/storedprocedures')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
+				"type": "AzureSqlTable",
+				"schema": [
 					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "JsonSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "JsonWriteSettings"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "AzureSqlTable1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "productblobservice",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
 					},
 					{
-						"name": "Sp Update Modified Date",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Copy data1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[UpdateProducts]"
-						},
-						"linkedServiceName": {
-							"referenceName": "productdb",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
-				"[concat(variables('factoryId'), '/datasets/productblobservice')]",
-				"[concat(variables('factoryId'), '/linkedServices/productdb')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dfTripData')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "tripdataCsv",
-								"type": "DatasetReference"
-							},
-							"name": "TripData"
-						},
-						{
-							"dataset": {
-								"referenceName": "Tripdatatable",
-								"type": "DatasetReference"
-							},
-							"name": "TripFare"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AvgSinkTable",
-								"type": "DatasetReference"
-							},
-							"name": "tripDataAggsink"
-						}
-					],
-					"transformations": [
-						{
-							"name": "joinTrip"
-						},
-						{
-							"name": "aggregatebypaymenttype"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          medallion as string,",
-						"          hack_license as string,",
-						"          vendor_id as string,",
-						"          rate_code as short,",
-						"          store_and_fwd_flag as boolean,",
-						"          pickup_datetime as timestamp,",
-						"          dropoff_datetime as timestamp,",
-						"          passenger_count as short,",
-						"          trip_time_in_secs as short,",
-						"          trip_distance as double,",
-						"          pickup_longitude as double,",
-						"          pickup_latitude as double,",
-						"          dropoff_longitude as double,",
-						"          dropoff_latitude as double",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> TripData",
-						"source(output(",
-						"          medallion as string,",
-						"          hack_license as string,",
-						"          vendor_id as string,",
-						"          pickup_datetime as string,",
-						"          payment_type as string,",
-						"          fare_amount as string,",
-						"          surcharge as string,",
-						"          mta_tax as string,",
-						"          tip_amount as string,",
-						"          tolls_amount as string,",
-						"          total_amount as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> TripFare",
-						"TripData, TripFare join(TripData@medallion == TripFare@medallion",
-						"     && TripData@hack_license == TripFare@hack_license",
-						"     && TripData@vendor_id == TripFare@vendor_id",
-						"     && TripData@pickup_datetime == toTimestamp(TripFare@pickup_datetime),",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> joinTrip",
-						"joinTrip aggregate(groupBy(payment_type),",
-						"     Average_fare = avg(toInteger(total_amount)),",
-						"          Total_Trip_distance = sum(toInteger(trip_distance))) ~> aggregatebypaymenttype",
-						"aggregatebypaymenttype sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> tripDataAggsink"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/tripdataCsv')]",
-				"[concat(variables('factoryId'), '/datasets/Tripdatatable')]",
-				"[concat(variables('factoryId'), '/datasets/AvgSinkTable')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dfproductsmarkup')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "AzureSqlTable1",
-								"type": "DatasetReference"
-							},
-							"name": "ProductStream"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "productblobservice",
-								"type": "DatasetReference"
-							},
-							"name": "sinkblob"
-						}
-					],
-					"transformations": [
-						{
-							"name": "calculatedmarkup"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          ProductID as integer,",
-						"          Name as string,",
-						"          ProductNumber as string,",
-						"          Color as string,",
-						"          StandardCost as decimal(19,4),",
-						"          ListPrice as decimal(19,4),",
-						"          Size as string,",
-						"          Weight as decimal(8,2),",
-						"          ProductCategoryID as integer,",
-						"          ProductModelID as integer,",
-						"          SellStartDate as timestamp,",
-						"          SellEndDate as timestamp,",
-						"          DiscontinuedDate as timestamp,",
-						"          ThumbNailPhoto as binary,",
-						"          ThumbnailPhotoFileName as string,",
-						"          rowguid as string,",
-						"          ModifiedDate as timestamp",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> ProductStream",
-						"ProductStream derive(Markup = ListPrice   / StandardCost) ~> calculatedmarkup",
-						"calculatedmarkup sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          ProductID,",
-						"          Name,",
-						"          ProductNumber,",
-						"          Color,",
-						"          StandardCost,",
-						"          ListPrice,",
-						"          Size,",
-						"          Weight,",
-						"          ProductCategoryID,",
-						"          ProductModelID,",
-						"          SellStartDate,",
-						"          SellEndDate,",
-						"          DiscontinuedDate,",
-						"          ModifiedDate,",
-						"          Markup",
-						"     )) ~> sinkblob"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
-				"[concat(variables('factoryId'), '/datasets/productblobservice')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/productsmarkuppipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
+						"name": "RevisionNumber",
+						"type": "tinyint",
+						"precision": 3
+					},
 					{
-						"name": "dfproductmarkp",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dfproductsmarkup",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"ProductStream": {},
-									"sinkblob": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DueDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ShipDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PurchaseOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipMethod",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreditCardApprovalCode",
+						"type": "varchar"
+					},
+					{
+						"name": "SubTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Freight",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalDue",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
 					}
 				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderHeader"
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dfproductsmarkup')]"
+				"[concat(variables('factoryId'), '/linkedServices/adventureworksdb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/costumerTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adventureworksdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NameStyle",
+						"type": "bit"
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Suffix",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CompanyName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "varchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adventureworksdb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adventurelookupcsv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adventureblob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "adventurelookup.csv",
+						"container": "lookup"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adventureblob')]"
 			]
 		}
 	]

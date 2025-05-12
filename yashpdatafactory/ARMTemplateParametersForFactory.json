@@ -29,6 +29,12 @@
 		"productsserver_password": {
 			"value": ""
 		},
+		"adventureworksdb_password": {
+			"value": ""
+		},
+		"adventureblob_connectionString": {
+			"value": ""
+		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"value": "https://datalakestyashp.dfs.core.windows.net/"
 		},
@@ -60,6 +66,15 @@
 			"value": "yashpdatabase"
 		},
 		"productsserver_properties_typeProperties_userName": {
+			"value": "yashp"
+		},
+		"adventureworksdb_properties_typeProperties_server": {
+			"value": "yashpserver2.database.windows.net"
+		},
+		"adventureworksdb_properties_typeProperties_database": {
+			"value": "yashpdatabase"
+		},
+		"adventureworksdb_properties_typeProperties_userName": {
 			"value": "yashp"
 		}
 	}

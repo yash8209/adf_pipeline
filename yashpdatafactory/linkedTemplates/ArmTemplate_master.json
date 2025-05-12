@@ -39,6 +39,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'productsserver'"
 		},
+		"adventureworksdb_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'adventureworksdb'"
+		},
+		"adventureblob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'adventureblob'"
+		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakestyashp.dfs.core.windows.net/"
@@ -80,6 +88,18 @@
 			"defaultValue": "yashpdatabase"
 		},
 		"productsserver_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "yashp"
+		},
+		"adventureworksdb_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "yashpserver2.database.windows.net"
+		},
+		"adventureworksdb_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "yashpdatabase"
+		},
+		"adventureworksdb_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "yashp"
 		},
@@ -134,6 +154,12 @@
 					"productsserver_password": {
 						"value": "[parameters('productsserver_password')]"
 					},
+					"adventureworksdb_password": {
+						"value": "[parameters('adventureworksdb_password')]"
+					},
+					"adventureblob_connectionString": {
+						"value": "[parameters('adventureblob_connectionString')]"
+					},
 					"ADLSGen2_properties_typeProperties_url": {
 						"value": "[parameters('ADLSGen2_properties_typeProperties_url')]"
 					},
@@ -166,6 +192,15 @@
 					},
 					"productsserver_properties_typeProperties_userName": {
 						"value": "[parameters('productsserver_properties_typeProperties_userName')]"
+					},
+					"adventureworksdb_properties_typeProperties_server": {
+						"value": "[parameters('adventureworksdb_properties_typeProperties_server')]"
+					},
+					"adventureworksdb_properties_typeProperties_database": {
+						"value": "[parameters('adventureworksdb_properties_typeProperties_database')]"
+					},
+					"adventureworksdb_properties_typeProperties_userName": {
+						"value": "[parameters('adventureworksdb_properties_typeProperties_userName')]"
 					}
 				}
 			},

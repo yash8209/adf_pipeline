@@ -39,6 +39,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'productsserver'"
 		},
+		"adventureworksdb_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'adventureworksdb'"
+		},
+		"adventureblob_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'adventureblob'"
+		},
 		"ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakestyashp.dfs.core.windows.net/"
@@ -80,6 +88,18 @@
 			"defaultValue": "yashpdatabase"
 		},
 		"productsserver_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "yashp"
+		},
+		"adventureworksdb_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "yashpserver2.database.windows.net"
+		},
+		"adventureworksdb_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "yashpdatabase"
+		},
+		"adventureworksdb_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "yashp"
 		}
@@ -1059,6 +1079,465 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
 				"[concat(variables('factoryId'), '/datasets/productblobservice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AdventureLookup')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DfLookup",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dfLookup",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SalesorderStream": {},
+									"CostumerStream": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dfLookup')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dfLookup')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SalesOrderHeadTable",
+								"type": "DatasetReference"
+							},
+							"name": "SalesorderStream"
+						},
+						{
+							"dataset": {
+								"referenceName": "costumerTable",
+								"type": "DatasetReference"
+							},
+							"name": "CostumerStream"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "adventurelookupcsv",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "lookup1"
+						},
+						{
+							"name": "selectcolumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          SalesOrderID as integer,",
+						"          RevisionNumber as integer,",
+						"          OrderDate as timestamp,",
+						"          DueDate as timestamp,",
+						"          ShipDate as timestamp,",
+						"          Status as integer,",
+						"          OnlineOrderFlag as boolean,",
+						"          SalesOrderNumber as string,",
+						"          PurchaseOrderNumber as string,",
+						"          AccountNumber as string,",
+						"          CustomerID as integer,",
+						"          ShipToAddressID as integer,",
+						"          BillToAddressID as integer,",
+						"          ShipMethod as string,",
+						"          CreditCardApprovalCode as string,",
+						"          SubTotal as decimal(19,4),",
+						"          TaxAmt as decimal(19,4),",
+						"          Freight as decimal(19,4),",
+						"          TotalDue as decimal(19,4),",
+						"          Comment as string,",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SalesorderStream",
+						"source(output(",
+						"          CustomerID as integer,",
+						"          NameStyle as boolean,",
+						"          Title as string,",
+						"          FirstName as string,",
+						"          MiddleName as string,",
+						"          LastName as string,",
+						"          Suffix as string,",
+						"          CompanyName as string,",
+						"          SalesPerson as string,",
+						"          EmailAddress as string,",
+						"          Phone as string,",
+						"          PasswordHash as string,",
+						"          PasswordSalt as string,",
+						"          rowguid as string,",
+						"          ModifiedDate as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> CostumerStream",
+						"SalesorderStream, CostumerStream lookup(SalesorderStream@CustomerID == CostumerStream@CustomerID,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
+						"lookup1 select(mapColumn(",
+						"          SalesOrderID,",
+						"          OrderDate,",
+						"          Status,",
+						"          SalesOrderNumber,",
+						"          PurchaseOrderNumber,",
+						"          AccountNumber,",
+						"          CustomerID = SalesorderStream@CustomerID,",
+						"          SubTotal,",
+						"          TaxAmt,",
+						"          Freight,",
+						"          TotalDue,",
+						"          CustomerID = CostumerStream@CustomerID,",
+						"          NameStyle,",
+						"          Title,",
+						"          FirstName,",
+						"          MiddleName,",
+						"          LastName,",
+						"          CompanyName,",
+						"          SalesPerson,",
+						"          EmailAddress,",
+						"          Phone",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectcolumns",
+						"selectcolumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesOrderHeadTable')]",
+				"[concat(variables('factoryId'), '/datasets/costumerTable')]",
+				"[concat(variables('factoryId'), '/datasets/adventurelookupcsv')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adventureworksdb')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('adventureworksdb_properties_typeProperties_server')]",
+					"database": "[parameters('adventureworksdb_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('adventureworksdb_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('adventureworksdb_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrderHeadTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adventureworksdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RevisionNumber",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DueDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ShipDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PurchaseOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipMethod",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreditCardApprovalCode",
+						"type": "varchar"
+					},
+					{
+						"name": "SubTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Freight",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalDue",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderHeader"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adventureworksdb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/costumerTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adventureworksdb",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NameStyle",
+						"type": "bit"
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Suffix",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CompanyName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "varchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adventureworksdb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adventureblob')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('adventureblob_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/adventurelookupcsv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "adventureblob",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "adventurelookup.csv",
+						"container": "lookup"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/adventureblob')]"
 			]
 		}
 	]
